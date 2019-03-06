@@ -1,4 +1,4 @@
-# DMPProject
+# Wi-Fi Robot Controller
 This is my project for the 'Design with Microprocessors' laboratory project.
 
 **Requirement**<br/>
