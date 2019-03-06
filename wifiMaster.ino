@@ -1,6 +1,7 @@
 #define DEBUG true
 #include <Wire.h>
 
+//variable to send to slave
 int x = 0;
 
 void setup() 
@@ -12,6 +13,7 @@ void setup()
   
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+  
   sendData("AT+RST\r\n", 2000, false); // reset module
   sendData("AT+CWMODE=2\r\n", 1000, false); // configure as access point
   sendData("AT+CIFSR\r\n", 1000, DEBUG); // get ip address
@@ -29,12 +31,14 @@ void loop()
       delay(500);
       int connectionId = Serial1.read() - 48; // read() function returns ASCII decimal value and 0 (the first decimal number) starts at 48
       
+      //setup control web page
       String webpage = "<h1>Hello World!</h1>";
       
       String cipSend = "AT+CIPSEND=";
       cipSend += connectionId;
       cipSend += ",";
       
+      //setup control buttons
       webpage += "<a href=\"/l0\"><button>FORWARD</button></a>";
       webpage += "<a href=\"/l1\"><button>BACKWARD</button></a>";
       webpage += "<a href=\"/l2\"><button>STOP</button></a>";
@@ -58,6 +62,7 @@ void loop()
   }
 }
 
+//send data to slave device
 String sendData(String command, const int timeout, boolean debug) 
 {
   String response = "";
@@ -73,6 +78,7 @@ String sendData(String command, const int timeout, boolean debug)
     }
   }
   
+  //going forward
   if (response.indexOf("/l0") != -1) 
   {
       Wire.beginTransmission(9); // transmit to device #9 
@@ -80,6 +86,7 @@ String sendData(String command, const int timeout, boolean debug)
       Wire.endTransmission(); // stop transmitting 
   }
   
+  //going backwards
   if (response.indexOf("/l1") != -1) 
   {
       Wire.beginTransmission(9); // transmit to device #9 
@@ -87,6 +94,7 @@ String sendData(String command, const int timeout, boolean debug)
       Wire.endTransmission(); // stop transmitting 
   }
 
+  //turn right
   if (response.indexOf("/l2") != -1) 
   {
       Wire.beginTransmission(9); // transmit to device #9 
@@ -94,12 +102,15 @@ String sendData(String command, const int timeout, boolean debug)
       Wire.endTransmission(); // stop transmitting 
   }
 
+  //turn left
   if (response.indexOf("/l3") != -1) 
   {
       Wire.beginTransmission(9); // transmit to device #9 
       Wire.write(3); // sends x 
       Wire.endTransmission(); // stop transmitting 
   }
+  
+  //accelerate
   if (response.indexOf("/l4") != -1) 
   {
       Wire.beginTransmission(9); // transmit to device #9 
@@ -110,18 +121,24 @@ String sendData(String command, const int timeout, boolean debug)
   {
     tone(8, 4978, 500);
   }
+  
+  //decelerate
   if (response.indexOf("/l6") != -1)
   {
       Wire.beginTransmission(9); // transmit to device #9 
       Wire.write(5); // sends x 
       Wire.endTransmission(); // stop transmitting 
   }
+  
+  //honk
   if (response.indexOf("/l7") != -1)
   {
       Wire.beginTransmission(9); // transmit to device #9 
       Wire.write(6); // sends x 
       Wire.endTransmission(); // stop transmitting 
   }
+  
+  //control servo motor
   if (response.indexOf("/l8") != -1)
   {
       Wire.beginTransmission(9); // transmit to device #9 
@@ -133,5 +150,6 @@ String sendData(String command, const int timeout, boolean debug)
   {
     Serial.print(response);
   }
+  
   return response;
 }
