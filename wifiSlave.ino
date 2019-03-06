@@ -9,7 +9,7 @@
 #define mpin10 3
 #define mpin11 11
 
-//value received
+//value received from master
 int x;
 
 //speed of motors
@@ -31,7 +31,9 @@ void setup()
   pinMode (mpin10, OUTPUT);
   pinMode (mpin11, OUTPUT); 
   
+  //begin I2C with slave device on pin 9
   Wire.begin(9);
+  //setup behavior function for received data
   Wire.onReceive(receiveEvent);
   
   Serial.begin(9600);
@@ -47,12 +49,12 @@ void StartMotor (int m1, int m2, int forward, int speed)
   }
   else
   {
-    if (forward)
+    if (forward)  //going forward 
     {
       digitalWrite(m2, 0);
       analogWrite (m1, speed); // use PWM
     }
-    else
+    else  //going backwards
     {
       digitalWrite(m1, 0);
       analogWrite(m2, speed);
@@ -60,7 +62,7 @@ void StartMotor (int m1, int m2, int forward, int speed)
   }
 } 
 
-//read the WIFI value
+//read the value from master
 void receiveEvent(int bytes)
 {
   x = Wire.read();
